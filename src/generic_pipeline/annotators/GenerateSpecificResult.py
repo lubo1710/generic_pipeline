@@ -44,7 +44,6 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                 if isinstance(oh_annotation, robokudo.types.annotation.SemanticColor):
                     if query_obj.color and not oh_annotation.color in query_obj.color:
                         print('Not the right object due color')
-                        print(f'{oh_annotation.color} is not in {query_obj.color}')
                         queried = False
                         break
                     object_designator.color.append(oh_annotation.color)
@@ -61,7 +60,6 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                         print('Not the right object due classification')
                         queried = False
                         break
-                    print(oh_annotation.source)
                     object_designator.type = oh_annotation.classname
 
                 if isinstance(oh_annotation, robokudo.types.cv.BoundingBox3D):
@@ -95,40 +93,15 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
                     object_designator.pose_source.append(oh_annotation.source)
 
-                if isinstance(oh_annotation, robokudo.types.annotation.PositionAnnotation):
-                    # TODO: Add here check with region filter
-                    ps = geometry_msgs.msg.PoseStamped()
-
-                    pos = PoseAnnotation()
-                    pos.source = oh_annotation.source
-                    pos.translation.insert(0, oh_annotation.translation[0])
-                    pos.translation.insert(1, oh_annotation.translation[1])
-                    pos.translation.insert(2, oh_annotation.translation[2])
-
-                    pos.rotation.insert(0, 0)
-                    pos.rotation.insert(1, 0)
-                    pos.rotation.insert(2, 0)
-                    pos.rotation.insert(3, 1)
-
-                    pose_map = transform_pose_from_cam_to_world(self.get_cas(), pos)
-
-                    # TODO create PoseStamped and add it to the list
-                    ps.pose.position.x = pose_map.translation[0]
-                    ps.pose.position.y = pose_map.translation[1]
-                    ps.pose.position.z = pose_map.translation[2]
-
-                    ps.pose.orientation.x = 0
-                    ps.pose.orientation.y = 0
-                    ps.pose.orientation.z = 0
-                    ps.pose.orientation.w = 1
-
-                    # We assume that the pose annotation is in CAMERA coordinates
-                    ps.header = copy.deepcopy(self.get_cas().get(CASViews.CAM_INFO).header)
-                    ps.header.frame_id = '/map'
-                    print('Füge Pose hinzu')
-                    object_designator.pose.append(ps)
-
-                    object_designator.pose_source.append(oh_annotation.source)
+                if isinstance(oh_annotation, robokudo.types.annotation.LocationAnnotation):
+                    print('Ich gehe hier rein')
+                    if oh_annotation.name != query_obj.location:
+                        print('Not the right object due location')
+                        queried = False
+                        break
+                    object_designator.location = oh_annotation.name
+                    print(f'Das ist die Annotation{oh_annotation}')
+                    print(f'Das ist der string aus der query: {query_obj.location}')
 
             if queried:
                 query_result.append(object_designator)

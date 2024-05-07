@@ -20,6 +20,7 @@ class RobokudoGraph(DiGraph):
         super().__init__(**attr)
         self.query = None
         self.specification = {}
+        self.end_nodes = []
 
 
     def load_class_from_file(self,file_path, class_name):
@@ -240,8 +241,9 @@ class RobokudoGraph(DiGraph):
         if query.obj.shape_size:
             queried_attributes.append(robokudo.types.annotation.Shape)
         if query.obj.location != '':
-            queried_attributes.append(robokudo.types.annotation.PositionAnnotation)
+            queried_attributes.append(robokudo.types.annotation.LocationAnnotation)
         if query.obj.attribute:
             self.specification[robokudo.types.core.Annotation] = query.obj.attribute[0].lower()
             queried_attributes.append(robokudo.types.core.Annotation)
+        self.end_nodes = queried_attributes
         self.__set_tree(queried_attributes)
