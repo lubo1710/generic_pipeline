@@ -39,13 +39,17 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
             object_hypotheses_count += 1
             object_designator = robokudo_msgs.msg.ObjectDesignator()
             queried = True
+            right_color = False
             for oh_annotation in annotation.annotations:
-                print(type(oh_annotation))
                 if isinstance(oh_annotation, robokudo.types.annotation.SemanticColor):
-                    if query_obj.color and not oh_annotation.color in query_obj.color:
+                    if query_obj.color and not oh_annotation.color in query_obj.color and not right_color:
+                        print(oh_annotation.color)
+                        print(query_obj.color)
                         print('Not the right object due color')
                         queried = False
                         break
+                    else:
+                        right_color = True
                     object_designator.color.append(oh_annotation.color)
 
                 if isinstance(oh_annotation, robokudo.types.annotation.Classification):
@@ -56,7 +60,14 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                             break
                         object_designator.attribute.append(oh_annotation.classname)
                         continue
-                    if oh_annotation.classname != query_obj.type and query_obj.type != '':
+                    if oh_annotation.source == 'FaceClassification':
+                        if oh_annotation.classname == '' or oh_annotation.classname != query_obj.type:
+                            print('Not the right object due face classification')
+                            queried = False
+                            break
+                        object_designator.type = oh_annotation.classname
+                        continue
+                    if oh_annotation.classname != query_obj.type:
                         print('Not the right object due classification')
                         queried = False
                         break
@@ -94,14 +105,16 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                     object_designator.pose_source.append(oh_annotation.source)
 
                 if isinstance(oh_annotation, robokudo.types.annotation.LocationAnnotation):
-                    print('Ich gehe hier rein')
                     if oh_annotation.name != query_obj.location:
                         print('Not the right object due location')
                         queried = False
                         break
                     object_designator.location = oh_annotation.name
-                    print(f'Das ist die Annotation{oh_annotation}')
-                    print(f'Das ist der string aus der query: {query_obj.location}')
+
+            if query_obj.location != '' and object_designator.location == '':
+                queried = False
+                print('Not the right object due location')
+
 
             if queried:
                 query_result.append(object_designator)
@@ -111,4 +124,3 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
         self.feedback_message = f"Send result for {object_hypotheses_count} object hypotheses"
         return py_trees.Status.SUCCESS
-

@@ -9,4 +9,5 @@ class Annotator:
     parameters = {}
     inputs = [robokudo.cas.CASViews.CLOUD,robokudo.types.annotation.Plane]
     outputs = [robokudo.types.scene.ObjectHypothesis, robokudo.types.annotation.Classification]
-    capabilities = {robokudo.types.annotation.Classification : 'object'}
+    capabilities = {robokudo.types.annotation.Classification : 'object',
+                    robokudo.types.scene.ObjectHypothesis : 'object'}

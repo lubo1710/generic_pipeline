@@ -17,4 +17,5 @@ class Annotator:
     }
     inputs = []
     outputs = [robokudo.types.scene.ObjectHypothesis , robokudo.types.annotation.Classification]
-    capabilities = {robokudo.types.annotation.Classification : ['cup' , 'Metalmug', 'crackerbox']}
+    capabilities = {robokudo.types.annotation.Classification : ['Cup' , 'Metalmug', 'Crackerbox'],
+                    robokudo.types.scene.ObjectHypothesis : ['Cup', 'Metalmug', 'Crackerbox']}

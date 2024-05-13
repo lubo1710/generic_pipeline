@@ -3,9 +3,11 @@ import py_trees
 import importlib.util
 from itertools import chain, combinations
 from networkx.classes import DiGraph
+from networkx.classes import MultiDiGraph
 from networkx.algorithms.traversal import bfs_tree
 import os
 import robokudo
+import robokudo.types.scene
 
 
 class RobokudoGraph(DiGraph):
@@ -20,7 +22,7 @@ class RobokudoGraph(DiGraph):
         super().__init__(**attr)
         self.query = None
         self.specification = {}
-        self.end_nodes = []
+        self.end_nodes = None
 
 
     def load_class_from_file(self,file_path, class_name):
@@ -60,44 +62,39 @@ class RobokudoGraph(DiGraph):
             for name in dicts.keys(): # laufe alle annotatoren durch
                 for outputs in dicts[name]['outputs']: # laufe alle outputs von annotatoren durch
                     if outputs in attributes: # Falls gesuchter output drin ist
-                        if outputs in self.specification.keys():  # Falls output genauer spezifiziert ist
-                            element = self.specification[outputs]
-                            if not element in dicts[name]['capabilities'][outputs]: # Falls gesuchtes Element nicht in den Capabilities des Annotators liegt überspringe
-                                continue
+                        if not self.__check_capabilities(dicts,outputs,name):
+                            continue
                         # Not empty input
                         for inputs in dicts[name]['inputs']:
                             attributes.append(inputs)
                             for out in dicts[name]['outputs']:
-                                # Füge alle inputs zu attributes hinzu und ziehe eine Kante
-                                #attributes.append(inputs)
-                                if out in self.specification.keys():
-                                    element = self.specification[out]
-                                    if not element in dicts[name]['capabilities'][
-                                        out]:  # Falls gesuchtes Element nicht in den Capabilities des Annotators liegt überspringe
-                                        continue
+                                if not self.__check_capabilities(dicts,out,name): continue
                                 self.add_edge(out, inputs, name=name, annotator=self.__load_annotator(name + '.py'))
                                 print(f'Add {name} to graph')
                         # Empty input
                         if not dicts[name]['inputs']:
                             for out in dicts[name]['outputs']:
-                                if out in self.specification.keys():
-                                    element = self.specification[out]
-                                    if not element in dicts[name]['capabilities'][
-                                        out]:  # Falls gesuchtes Element nicht in den Capabilities des Annotators liegt überspringe
-                                        continue
+                                if not self.__check_capabilities(dicts, out, name): continue
                                 self.add_edge(out,'root', name=name,annotator=self.__load_annotator(name + '.py'))
                                 print(f'Add {name} to graph')
                         # Delete ouputs from the added annotator
                         for out in dicts[name]['outputs']:
+                            if not self.__check_capabilities(dicts, out, name): continue
                             while out in attributes:
-                                print(out)
                                 attributes.remove(out)
-                            failure = False
-        print(attributes)
+                        failure = False
+        print('Network is ready')
         self.__reduce_graph()
         if failure:
             raise TypeError(f'Could not compute graph through {attributes}')
 
+    def __check_capabilities(self,dicts, outputs ,name):
+        '''Returns false, when the output is specified and not in the capabilities of the annotator'''
+        if outputs in self.specification.keys():  # Falls output genauer spezifiziert ist
+            element = self.specification[outputs]
+            if not element in dicts[name]['capabilities'][outputs]:
+                return False
+        return True
 
     def __load_annotator(self, filename):
         """
@@ -138,6 +135,18 @@ class RobokudoGraph(DiGraph):
         Man stellt alle Teilmengen von Annotatoren auf und führt dann BFS durch und überprüft, ob alle Knoten
         erreicht werden können. Resultat ist ein Baum mit minimaler Anzahl an Annotatoren
         '''
+        # Compute minimale anzahl an edges
+        useful_nodes = set()
+        for node in self.end_nodes:
+            tree = bfs_tree(self, node)
+            useful_nodes = useful_nodes | tree.nodes()
+        unuseful_nodes = self.nodes - useful_nodes
+        for node in unuseful_nodes:
+            self.remove_node(node)
+        print(f'Reduced Graph by {len(unuseful_nodes)} nodes')
+
+
+        # Compute minimale anzahl an annotatoren
         annotators = set() # Mengen in Python
         all_edges = []
         for edge in self.edges():
@@ -227,16 +236,18 @@ class RobokudoGraph(DiGraph):
         """
 
         self.query = query
-        # Add pose because the query always starts with 'DETECT ...'
+        # Add pose because querys always starts with 'DETECT ...'
         queried_attributes = [robokudo.types.annotation.PoseAnnotation]
         if query.obj.color:
             self.specification[robokudo.types.annotation.SemanticColor] = query.obj.color[0].lower()
             queried_attributes.append(robokudo.types.annotation.SemanticColor)
         if query.obj.type != '':
-            self.specification[robokudo.types.annotation.Classification] = query.obj.type.lower()
+            self.specification[robokudo.types.annotation.Classification] = query.obj.type
+            self.specification[robokudo.types.scene.ObjectHypothesis] = query.obj.type
             queried_attributes.append(robokudo.types.annotation.Classification)
         else:
             self.specification[robokudo.types.annotation.Classification] = 'object'
+            self.specification[robokudo.types.scene.ObjectHypothesis] = 'object'
             queried_attributes.append(robokudo.types.annotation.Classification)
         if query.obj.shape_size:
             queried_attributes.append(robokudo.types.annotation.Shape)
@@ -245,5 +256,5 @@ class RobokudoGraph(DiGraph):
         if query.obj.attribute:
             self.specification[robokudo.types.core.Annotation] = query.obj.attribute[0].lower()
             queried_attributes.append(robokudo.types.core.Annotation)
-        self.end_nodes = queried_attributes
+        self.end_nodes = queried_attributes.copy()
         self.__set_tree(queried_attributes)

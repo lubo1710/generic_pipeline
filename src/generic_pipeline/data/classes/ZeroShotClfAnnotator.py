@@ -10,10 +10,10 @@ class Annotator:
     description = 'Returns the more likely class out of the classes parameter'
     descriptor = {}
     parameters = {
-        'classes' : ['dog', 'cat'],
+        'classes' : ['standing', 'sitting'],
         'save_top_k' : 0,
         'analysis_scope' : robokudo.types.scene.ObjectHypothesis
     }
     inputs = [robokudo.types.scene.ObjectHypothesis]
     outputs = [robokudo.types.core.Annotation]
-    capabilities = {robokudo.types.core.Annotation : ['dog' , 'cat']}
+    capabilities = {robokudo.types.core.Annotation : ['standing' , 'sitting']}
