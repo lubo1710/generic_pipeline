@@ -4,7 +4,7 @@ import robokudo.types.scene
 class Annotator:
     name = 'ClusterColorAnnotator'
     source =  'robokudo.annotators.cluster_color'
-    description = 'Detects the colors of ObjectHypothesis'
+    description = 'Detects color of ObjectHypothesis'
     descriptor = {}
     parameters = {}
     inputs = [robokudo.types.scene.ObjectHypothesis]

@@ -4,9 +4,9 @@ import robokudo.types.human
 class Annotator:
     name = 'FaceDetector'
     source =  'robokudo_faces.annotators.face_detector'
-    description = 'Classifies faces'
+    description = 'Detect faces'
     descriptor = {}
     parameters = {}
     inputs = []
-    outputs = [robokudo.types.human.FaceAnnotation]
-    capabilities = {}
+    outputs = [robokudo.types.human.FaceAnnotation, robokudo.types.scene.ObjectHypothesis]
+    capabilities = {robokudo.types.scene.ObjectHypothesis : ['leonie','lukas']}
