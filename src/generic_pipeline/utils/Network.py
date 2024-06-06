@@ -8,6 +8,7 @@ from networkx.algorithms.traversal import bfs_tree
 import os
 import robokudo
 import robokudo.types.scene
+import time
 
 
 class RobokudoGraph(DiGraph):
@@ -23,6 +24,8 @@ class RobokudoGraph(DiGraph):
         self.query = None
         self.specification = {}
         self.end_nodes = None
+        self.timebegin = None
+        self.timeend = None
 
 
     def load_class_from_file(self,file_path, class_name):
@@ -208,6 +211,9 @@ class RobokudoGraph(DiGraph):
             annotator_list.append(annotator['annotator'])
 
         print( f'Network compute this pipeline: {annotator_names}')
+        self.timeend = time.time()
+        print(self.timeend - self.timebegin)
+        print(f'Process took {self.timeend-self.timebegin} seconds')
         seq = py_trees.composites.Sequence()
         seq.add_children(annotator_list)
         return seq
@@ -234,6 +240,7 @@ class RobokudoGraph(DiGraph):
 
             string[] description
         """
+        self.timebegin = time.time()
 
         self.query = query
         # Add pose because querys always starts with 'DETECT ...'

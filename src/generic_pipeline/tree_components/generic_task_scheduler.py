@@ -9,18 +9,12 @@ from generic_pipeline.utils.Network import RobokudoGraph
 class GenericTaskScheduler(robokudo.tree_components.task_scheduler.TaskSchedulerBase,
                           robokudo.annotators.core.BaseAnnotator):
     """
-    A Task Scheduler that checks the active Query in the CAS to infer which perception subtree to execute.
-    You can apply a function to infer per use-case which perception tree you want to incorporate.
-
-    Original implementation by Malte Huerkamp
+    A Task Scheduler that submitted the query to the RobokudoGraph and receives a suitable sequence of annotators
     """
 
     def __init__(self, name="QueryBasedScheduler"):
         """
-        Tasks should be a dict with key='task-identifier' and value a py_trees.Behaviour)
-
-        :param: filter_fn a callable/function which returns a string with the identifier of the subtree to include.
-        This function will receive the CASViews.QUERY and can then decide which subtree identifier is the desired one.
+        Constructor that initializes the RobokudoGraph
         """
         self.graph = RobokudoGraph()
         super().__init__(name)
