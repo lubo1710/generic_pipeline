@@ -59,6 +59,7 @@ class RobokudoGraph(DiGraph):
         except FileNotFoundError:
             raise 'File not Found'
 
+        print(attributes)
         failure = False
         while attributes and not failure: # Solange Attribute nicht leer
             failure = True
@@ -86,10 +87,10 @@ class RobokudoGraph(DiGraph):
                             while out in attributes:
                                 attributes.remove(out)
                         failure = False
-        print('Network is ready')
-        self.__reduce_graph()
         if failure:
             raise TypeError(f'Could not compute graph through {attributes}')
+        print('Network is ready')
+        self.__reduce_graph()
 
     def __check_capabilities(self,dicts, outputs ,name):
         '''Returns false, when the output is specified and not in the capabilities of the annotator'''
@@ -243,25 +244,98 @@ class RobokudoGraph(DiGraph):
         self.timebegin = time.time()
 
         self.query = query
-        # Add pose because querys always starts with 'DETECT ...'
+
+        list_of_objects = [
+    'Fork',
+    'Pitcher',
+    'Bleachcleanserbottle',
+    'Crackerbox',
+    'Minisoccerball',
+    'Baseball',
+    'Mustardbottle',
+    'Jellochocolatepuddingbox',
+    'Wineglass',
+    'Orange',
+    'Coffeepack',
+    'Softball',
+    'Metalplate',
+    'Pringleschipscan',
+    'Strawberry',
+    'Glasscleanerspraybottle',
+    'Tennisball',
+    'Spoon',
+    'Metalmug',
+    'Abrasivesponge',
+    'Jellobox',
+    'Dishwashertab',
+    'Knife',
+    'Cerealbox',
+    'Metalbowl',
+    'Sugarbox',
+    'Coffeecan',
+    'Milkpackja',
+    'Apple',
+    'Tomatosoupcan',
+    'Tunafishcan',
+    'Gelatinebox',
+    'Pear',
+    'Lemon',
+    'Banana',
+    'Pottedmeatcan',
+    'Peach',
+    'Plum',
+    'Rubikscube',
+    'Mueslibox',
+    'Cupblue',
+    'Cupgreen',
+    'Largemarker',
+    'Masterchefcan',
+    'Scissors',
+    'Scrubcleaner',
+    'Grapes',
+    'Cup_small',
+    'screwdriver',
+    'clamp',
+    'hammer',
+    'wooden_block',
+    'Cornybox',
+    'object']
+
+        #Pose & ObjectHypothese
         queried_attributes = [robokudo.types.annotation.PoseAnnotation]
-        if query.obj.color:
-            self.specification[robokudo.types.annotation.SemanticColor] = query.obj.color[0].lower()
-            queried_attributes.append(robokudo.types.annotation.SemanticColor)
-        if query.obj.type != '':
-            self.specification[robokudo.types.annotation.Classification] = query.obj.type
-            self.specification[robokudo.types.scene.ObjectHypothesis] = query.obj.type
-            queried_attributes.append(robokudo.types.annotation.Classification)
-        else:
-            self.specification[robokudo.types.annotation.Classification] = 'object'
+        if query.obj.type == 'person':
+            self.specification[robokudo.types.scene.ObjectHypothesis] = 'person'
+            self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
+
+        if query.obj.type == '':
             self.specification[robokudo.types.scene.ObjectHypothesis] = 'object'
+            self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
+
+        if query.obj.type != 'person' and query.obj.type != '':
+            if query.obj.type in list_of_objects:
+                self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
+                self.specification[robokudo.types.scene.ObjectHypothesis] = query.obj.type
+            else:
+                self.specification[robokudo.types.annotation.PoseAnnotation] = 'person'
+            self.specification[robokudo.types.annotation.Classification] = query.obj.type
+            print('insert classification')
             queried_attributes.append(robokudo.types.annotation.Classification)
-        if query.obj.shape_size:
+
+        # Color
+        if query.obj.color:
+            queried_attributes.append(robokudo.types.annotation.SemanticColor)
+
+        # Size
+        if query.obj.size:
             queried_attributes.append(robokudo.types.annotation.Shape)
+
+        # Location
         if query.obj.location != '':
             queried_attributes.append(robokudo.types.annotation.LocationAnnotation)
+
+        # Attributes
         if query.obj.attribute:
-            self.specification[robokudo.types.core.Annotation] = query.obj.attribute[0].lower()
             queried_attributes.append(robokudo.types.core.Annotation)
+
         self.end_nodes = queried_attributes.copy()
         self.__set_tree(queried_attributes)

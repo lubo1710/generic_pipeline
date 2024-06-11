@@ -41,6 +41,7 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
             queried = True
             right_color = False
             for oh_annotation in annotation.annotations:
+                # Color
                 if isinstance(oh_annotation, robokudo.types.annotation.SemanticColor):
                     if query_obj.color and not oh_annotation.color in query_obj.color and not right_color:
                         print(oh_annotation.color)
@@ -52,27 +53,36 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                         right_color = True
                     object_designator.color.append(oh_annotation.color)
 
+                # Classfications
                 if isinstance(oh_annotation, robokudo.types.annotation.Classification):
+                    # ZeroShot
                     if oh_annotation.source == 'ZeroShotClfAnnotator':
-                        if oh_annotation.classname != query_obj.attribute[0]:
+                        str = oh_annotation.classname.split(' ')
+                        color = str[2]
+                        print(str)
+                        if color != query_obj.attribute[0]:
                             print('Not the right object due attributes')
                             queried = False
                             break
                         object_designator.attribute.append(oh_annotation.classname)
                         continue
-                    if oh_annotation.source == 'FaceClassification':
-                        if oh_annotation.classname == '' or oh_annotation.classname != query_obj.type:
+                    # Face Classification
+                    if oh_annotation.source == 'FaceClassification' or oh_annotation.source == 'StoreFaces':
+                        if oh_annotation.classname != query_obj.type:
                             print('Not the right object due face classification')
                             queried = False
                             break
                         object_designator.type = oh_annotation.classname
                         continue
-                    if oh_annotation.classname != query_obj.type:
+
+                    # YoloAnnotator
+                    if oh_annotation.classname != query_obj.type and query_obj.type != '':
                         print('Not the right object due classification')
                         queried = False
                         break
                     object_designator.type = oh_annotation.classname
 
+                # Size
                 if isinstance(oh_annotation, robokudo.types.cv.BoundingBox3D):
                     size = ShapeSize()
                     vector = Vector3()

@@ -8,6 +8,6 @@ class Annotator:
     description = 'Calculates a pose based on a ObjectHypothesis'
     descriptor = {}
     parameters = {}
-    inputs = [robokudo.types.scene.ObjectHypothesis]
-    outputs = [robokudo.types.annotation.PositionAnnotation]
-    capabilities = []
+    inputs = [robokudo.types.scene.HumanHypothesis, robokudo.cas.CASViews.CLOUD]
+    outputs = [robokudo.types.annotation.PoseAnnotation]
+    capabilities = {robokudo.types.annotation.PoseAnnotation : ['person']}

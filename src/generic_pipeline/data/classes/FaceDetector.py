@@ -8,5 +8,5 @@ class Annotator:
     descriptor = {}
     parameters = {}
     inputs = []
-    outputs = [robokudo.types.human.FaceAnnotation, robokudo.types.scene.ObjectHypothesis]
-    capabilities = {robokudo.types.scene.ObjectHypothesis : ['leonie','lukas']}
+    outputs = [robokudo.types.human.FaceAnnotation, robokudo.types.scene.HumanHypothesis]
+    capabilities = {}

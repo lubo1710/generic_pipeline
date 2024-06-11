@@ -12,8 +12,9 @@ class Annotator:
     parameters = {
         'classes' : ['standing', 'sitting'],
         'save_top_k' : 0,
-        'analysis_scope' : robokudo.types.scene.ObjectHypothesis
+        'analysis_scope' : robokudo.types.scene.ObjectHypothesis,
+        'gpsr' : True
     }
     inputs = [robokudo.types.scene.ObjectHypothesis]
     outputs = [robokudo.types.core.Annotation]
-    capabilities = {robokudo.types.core.Annotation : ['standing' , 'sitting']}
+    capabilities = {}

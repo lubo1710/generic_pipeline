@@ -9,6 +9,5 @@ class Annotator:
     parameters = {}
     inputs = [robokudo.types.scene.ObjectHypothesis]
     outputs = [robokudo.types.annotation.SemanticColor]
-    capabilities = {robokudo.types.annotation.SemanticColor: ['red','yellow','green','blue','magenta',
-                                                                'cyan', 'white','black','grey']}
+    capabilities = {}
 

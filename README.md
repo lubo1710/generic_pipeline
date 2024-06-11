@@ -14,6 +14,9 @@ catkin build
 It is important to rebuild your workspace after cloning the package to enable usability.
 For following dependencies, i recommend to use a virtual environment.
 
+```bash
+pip install networkx
+```
 ## How to add parameters to annotators
 This package contains in the *data/classes* directory for every annotator a file with a dataclass. In this file you can adapt the parameters and descriptors for your own annotators. Just follow the pattern
 from the currently existing files.
@@ -52,7 +55,11 @@ git clone git@gitlab.informatik.uni-bremen.de:robokudo/robokudo_faces.git
 cd robokudo_faces
 pip install -r requirements.txt
 ```
+
+For gpsr are it is necessary to change the face_classification for new a new file.
+It can be found under this link TODO.
 Within the generic_pipeline package exists a directory called *faces* containing images from faces that can be recognized.
+For GPSR the directory can be empty.
 
 ## Install ZeroShotClf
 The first step includes cloning the repo and installing the dependencies.
@@ -61,7 +68,12 @@ git clone git@gitlab.informatik.uni-bremen.de:robokudo/robokudo_zero_shot_classi
 cd robokudo_zero_shot_classification
 pip install -r requirements.txt
 ```
-All adjustments can be done within the dataclass file.
+
+If you have trouble after this step try to execute the following command
+
+```batch
+pip install empy=3.3.4
+```
 
 # How to start this package
 Just run the following command:
