@@ -11,6 +11,8 @@ Just clone this package into your robokudo workspace under the *\src*. To learn 
 git clone git@github.com:lubo1710/generic_pipeline.git
 catkin build
 ```
+
+For GPSR change branch to GPSR.
 It is important to rebuild your workspace after cloning the package to enable usability.
 For following dependencies, i recommend to use a virtual environment.
 
@@ -57,7 +59,7 @@ pip install -r requirements.txt
 ```
 
 For gpsr are it is necessary to change the face_classification for new a new file.
-It can be found under this link TODO.
+It can be found under this [link](https://nc.uni-bremen.de/index.php/s/ZiqfWoWE9mooq7H).
 Within the generic_pipeline package exists a directory called *faces* containing images from faces that can be recognized.
 For GPSR the directory can be empty.
 
@@ -67,6 +69,36 @@ The first step includes cloning the repo and installing the dependencies.
 git clone git@gitlab.informatik.uni-bremen.de:robokudo/robokudo_zero_shot_classification.git
 cd robokudo_zero_shot_classification
 pip install -r requirements.txt
+catkin build
+```
+
+For GPSR:
+
+Open the ZeroshotClfAnnotator and append at the top of the compute function the following code snippet
+
+```python
+    def compute(self):
+        """Infer the classes for the given image and analysis scope.
+
+        Raises:
+            ValueError: If the analysis scope is not supported.
+        """
+        # GPSR Adjustments
+        human_behaviours = ['standing', 'pointing', 'sitting', 'raising arm']
+        colors = ['black', 'white', 'green']
+        if self.parameters.gpsr:
+            attributes = self.get_cas().get(CASViews.QUERY).obj.attribute
+            if len(attributes) == 1:
+                self.classes = human_behaviours
+            else:
+                self.classes = []
+                if not (attributes[0] in colors):
+                    colors.append(attributes)
+                for color in colors:
+                    self.classes.append(f'Person wearing {color} {attributes[1]}')
+        # GPSR adjustments end
+
+        ...
 ```
 
 If you have trouble after this step try to execute the following command
@@ -75,11 +107,28 @@ If you have trouble after this step try to execute the following command
 pip install empy=3.3.4
 ```
 
+## Install HumanDetection
+The first step includes cloning the repo and installing the dependencies.
+```bash
+git clone git@gitlab.informatik.uni-bremen.de:robokudo/robokudo_human_detection.git
+cd robokudo_human_detection
+pip install -r requirements.txt
+```
+
+This package utilizes git large file system. make sure to install it before clonin gthis package.
+
+The next step is stupid, but important for gpsr. Open the human_and_pose annotator and append at the end of the 
+init function the following line
+
+```python
+def __init__(...):
+    ...
+    self.setup(10)
+```
+
 # How to start this package
 Just run the following command:
 ```bash
 rosrun robokudo main.py _ae=generic _ros_pkg=generic_pipeline
 ```
-If your installtion is correct, this engine waits for a incoming query. For test purposes use [actionlib_tools](git@github.com:ros/actionlib.git) or a high-level context.
-
-
+If your installation is correct, this engine waits for an incoming query. For test purposes use [actionlib_tools](git@github.com:ros/actionlib.git) or a high-level context.

@@ -58,9 +58,11 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                     # ZeroShot
                     if oh_annotation.source == 'ZeroShotClfAnnotator':
                         str = oh_annotation.classname.split(' ')
-                        color = str[2]
-                        print(str)
-                        if color != query_obj.attribute[0]:
+                        if len(str) > 1:
+                            decision = str[2]
+                        else:
+                            decision = str[0]
+                        if decision != query_obj.attribute[0]:
                             print('Not the right object due attributes')
                             queried = False
                             break
