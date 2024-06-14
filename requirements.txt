@@ -1,7 +1,11 @@
 networkx
-
+empy==3.3.4
+catkin_pkg
+rospkg
+termcolor
+pycryptodomex
+gnupg
 face_recognition
-
 pytest>=7.1.1
 open3d>=0.15.2
 numpy>=1.22.3
@@ -10,12 +14,9 @@ scipy>=1.8.0
 pymongo
 numba
 pyyaml
-
 ultralytics
-
 segment_anything
 ultralytics
 pillow
 tqdn
-
 transformers
