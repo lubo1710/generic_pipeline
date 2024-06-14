@@ -3,7 +3,7 @@ import robokudo.types.human
 @dataclass()
 class Annotator:
     name = 'FaceClassification'
-    source =  'robokudo_faces.annotators.face_classification'
+    source =  'generic_pipeline.annotators.face_classification'
     description = 'Classifies faces'
     descriptor = {}
     parameters = {

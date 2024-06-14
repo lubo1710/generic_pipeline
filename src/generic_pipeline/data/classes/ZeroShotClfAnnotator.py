@@ -6,7 +6,7 @@ import robokudo.types.scene
 @dataclass()
 class Annotator:
     name = 'ZeroShotClfAnnotator'
-    source =  'robokudo_zero_shot_classification.annotators.zero_shot_classification'
+    source =  'generic_pipeline.annotators.zero_shot_classification'
     description = 'Returns the more likely class out of the classes parameter'
     descriptor = {}
     parameters = {

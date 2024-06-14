@@ -60,7 +60,7 @@ liste = [
 @dataclass()
 class Annotator:
     name = 'YoloAnnotator'
-    source =  'robokudo_yolo.annotators.YoloAnnotator'
+    source =  'generic_pipeline.annotators.YoloAnnotator'
     description = 'Detects objects in images and creates a ObjectHypothesis'
     descriptor = {}
     parameters = {

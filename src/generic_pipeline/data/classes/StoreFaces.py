@@ -3,7 +3,7 @@ import robokudo.types.human
 @dataclass()
 class Annotator:
     name = 'StoreFaces'
-    source =  'robokudo_faces.annotators.store_unknown_faces'
+    source =  'generic_pipeline.annotators.store_unknown_faces'
     description = 'Stores unknown faces'
     descriptor = {}
     parameters = {

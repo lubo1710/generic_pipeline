@@ -3,7 +3,7 @@ import robokudo.types.human
 @dataclass()
 class Annotator:
     name = 'SizeAnnotatorBBAdjusted'
-    source =  'generic_pipeline.annotators.size_annotator_adjusted'
+    source =  'milestone1.annotators.size_annotator_adjusted'
     description = 'Estimates size'
     descriptor = {}
     parameters = {}

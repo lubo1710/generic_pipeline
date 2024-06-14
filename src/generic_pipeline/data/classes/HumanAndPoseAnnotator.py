@@ -3,7 +3,7 @@ import robokudo.types.human
 @dataclass()
 class Annotator:
     name = 'HumanAndPoseAnnotator'
-    source =  'robokudo_human_detection.annotators.human_and_pose'
+    source =  'generic_pipeline.annotators.human_and_pose'
     description = 'Detect humans'
     descriptor = {}
     parameters = {

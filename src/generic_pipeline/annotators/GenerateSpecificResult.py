@@ -116,6 +116,39 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
                     object_designator.pose_source.append(oh_annotation.source)
 
+                if isinstance(oh_annotation, robokudo.types.annotation.PositionAnnotation):
+                    ps = geometry_msgs.msg.PoseStamped()
+
+                    pos = PoseAnnotation()
+                    pos.source = oh_annotation.source
+                    pos.translation.insert(0, oh_annotation.translation[0])
+                    pos.translation.insert(1, oh_annotation.translation[1])
+                    pos.translation.insert(2, oh_annotation.translation[2])
+
+                    pos.rotation.insert(0, 0)
+                    pos.rotation.insert(1, 0)
+                    pos.rotation.insert(2, 0)
+                    pos.rotation.insert(3, 1)
+
+                    pose_map = transform_pose_from_cam_to_world(self.get_cas(), pos)
+
+                    # TODO create PoseStamped and add it to the list
+                    ps.pose.position.x = pose_map.translation[0]
+                    ps.pose.position.y = pose_map.translation[1]
+                    ps.pose.position.z = pose_map.translation[2]
+
+                    ps.pose.orientation.x = 0
+                    ps.pose.orientation.y = 0
+                    ps.pose.orientation.z = 0
+                    ps.pose.orientation.w = 1
+
+                    # We assume that the pose annotation is in CAMERA coordinates
+                    ps.header = copy.deepcopy(self.get_cas().get(CASViews.CAM_INFO).header)
+                    ps.header.frame_id = '/map'
+                    object_designator.pose.append(ps)
+
+                    object_designator.pose_source.append(oh_annotation.source)
+
                 if isinstance(oh_annotation, robokudo.types.annotation.LocationAnnotation):
                     if oh_annotation.name != query_obj.location:
                         print('Not the right object due location')
