@@ -59,17 +59,12 @@ liste = [
 
 @dataclass()
 class Annotator:
-    name = 'YoloAnnotator'
-    source =  'generic_pipeline.annotators.YoloAnnotator'
-    description = 'Detects objects in images and creates a ObjectHypothesis'
+    name = 'OutlierRemovalOnObjectHypothesisAnnotator'
+    source =  'generic_pipeline.annotators.outlier_removal_objecthypothesis'
+    description = 'Removes outlier from OH'
     descriptor = {}
-    parameters = {
-    'precision_mode' : True,
-    'ros_pkg_path' : 'generic_pipeline',
-    'weights_path' : 'src/generic_pipeline/Weights-SUTURO23/data_03_24.pt',
-    'id2name_json_path' : 'src/generic_pipeline/data/json/id2name_edit.json',
-    'threshold' : 0.6
-    }
-    inputs = []
-    outputs = [robokudo.types.annotation.StampedPoseAnnotation]
-    capabilities = {}
+    parameters = {}
+    inputs = [robokudo.types.annotation.StampedPoseAnnotation, robokudo.cas.CASViews.CLOUD]
+    outputs = [robokudo.types.scene.ObjectHypothesis , robokudo.types.annotation.Classification, robokudo.types.annotation.Shape]
+    capabilities = {robokudo.types.scene.ObjectHypothesis : liste,
+                    robokudo.types.annotation.Classification : liste}

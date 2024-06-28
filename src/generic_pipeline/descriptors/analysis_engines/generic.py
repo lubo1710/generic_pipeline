@@ -9,6 +9,7 @@ from robokudo.annotators.query import QueryAnnotator
 import robokudo.annotators
 from generic_pipeline.annotators.GenerateSpecificResult import GenerateSpecificResult
 from generic_pipeline.tree_components.generic_task_scheduler import GenericTaskScheduler
+from generic_pipeline.annotators.filter_objects_by_area import FilterObjectsByArea
 
 class AnalysisEngine(robokudo.analysis_engine.AnalysisEngineInterface):
     def name(self):
@@ -27,7 +28,6 @@ class AnalysisEngine(robokudo.analysis_engine.AnalysisEngineInterface):
         wrapper.add_child(GenericTaskScheduler())
 
         seq = robokudo.pipeline.Pipeline('RWPipeline')
-
         # Basic pipeline, where wrapper contains specific annotators for query
         seq.add_children(
             [
@@ -35,6 +35,7 @@ class AnalysisEngine(robokudo.analysis_engine.AnalysisEngineInterface):
                 QueryAnnotator(),
                 CollectionReaderAnnotator(hsr_config),
                 wrapper,
+                FilterObjectsByArea(),
                 GenerateSpecificResult()
             ]
         )
