@@ -6,14 +6,6 @@ termcolor
 pycryptodomex
 gnupg
 face_recognition
-pytest>=7.1.1
-open3d>=0.15.2
-numpy>=1.22.3
-pydot>=1.4.2
-scipy>=1.8.0
-pymongo
-numba
-pyyaml
 ultralytics
 segment_anything
 ultralytics
