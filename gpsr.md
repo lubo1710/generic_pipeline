@@ -42,7 +42,18 @@ Die List der erkannten Objekte muss in der Network klasse angepasst werden. Und 
 
 ### Besonderheit bei person
 Sollte 'person' im type feld stehen, werden alle Personen erkannt und zurückgegeben, falls alle anderen
-spezifikation erfüllt sind.
+spezifikation erfüllt sind. Dabei wird die nicht auf das Gesicht geachtet, sondern nur die Person erkannt.
+Die Ausgabe enthält dabei einen leeren Type.
+
+Der Ordner mit erkannten Gesichtern wird nicht nach jedem Durchlauf gelöscht. In dem
+top-level directory liegt ein Skript, dass diesen Ordner löscht. Es kann hilfreich sein
+den Ordner zu löschen, wenn viele Gesichter abgespeichert sind, um die Anzahl der Personen
+mit denen das erkannte Gesicht verglichen wird zu reduzieren.
+
+### Besonderheit für Gesichter
+Sollte 'faces' im type Feld übergeben werden, werden alle Gesichter erkannt. Dabei wird eine eindeutige ID
+festgelegt und unbekannte Gesichter werden unter dieser ID abgespeichert z.b. human_0 oder human_1, sodass in einem nächsten Aufruf,
+das Gesicht wieder erkannt werden kann.
 
 ## Shape 
 Wenn etwas in size drinsteht, wird eine ShapeSize zurückgegeben. Der Inhalt bei size
@@ -120,11 +131,11 @@ ObjectDesignator
 
 Bekannter Mensch:
 ```
-type = '1'
+type = 'faces'
 ==== result
 [
 ObjectDesignator 
-    type = '1'
+    type = 'human_0'
 ]
 ```
 

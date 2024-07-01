@@ -68,7 +68,7 @@ class StoreFaces(robokudo.annotators.core.ThreadedAnnotator):
                     file_path = full_path
 
                     # Store unknown image under a unique id
-                    file_name = self._get_id(full_path) + '.png'
+                    file_name = f'human_{self._get_id(full_path)}.png'
                     file = os.path.join(file_path, file_name)
                     cropped_image = color_image[y_min:y_max,x_min:x_max]
                     image = Image.fromarray(cropped_image)
@@ -80,7 +80,6 @@ class StoreFaces(robokudo.annotators.core.ThreadedAnnotator):
                     classification.classification_type = 'face'
                     classification.classname = file_name.split(".")[0]
                     annotation.annotations.append(classification)
-
 
         end_timer = default_timer()
         self.feedback_message = f'Processing took {(end_timer - start_timer):.4f}s'
