@@ -70,10 +70,6 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                         continue
                     # Face Classification
                     if oh_annotation.source == 'FaceClassification' or oh_annotation.source == 'StoreFaces':
-                        if oh_annotation.classname != query_obj.type:
-                            print('Not the right object due face classification')
-                            queried = False
-                            break
                         object_designator.type = oh_annotation.classname
                         continue
 

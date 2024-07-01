@@ -13,4 +13,4 @@ class Annotator:
     }
     inputs = [robokudo.types.annotation.Cuboid]
     outputs = [robokudo.types.annotation.Classification]
-    capabilities = {robokudo.types.annotation.Classification : ['lukas', 'johannes']}
+    capabilities = {robokudo.types.annotation.Classification : ['faces']}
