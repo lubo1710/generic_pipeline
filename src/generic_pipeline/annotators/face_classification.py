@@ -25,7 +25,8 @@ class FaceClassification(robokudo.annotators.core.BaseAnnotator):
                 self.data_path = None  # Relative Path to the folder containing the models
                 self.file_names = []  # files in self.data_path to load
                 self.labels = []  # 'class labels' for each of the file
-                self.confidence = 0.6
+                self.tolerance = 0.6
+                self.distance = 0.6
 
         parameters = Parameters()  # overwrite the parameters explicitly to enable auto-completion
 
@@ -33,6 +34,7 @@ class FaceClassification(robokudo.annotators.core.BaseAnnotator):
         super().__init__(name, descriptor)
         self.rk_logger.debug("%s.__init__()" % self.__class__.__name__)
         self.known_face_encodings = []
+        self.known_person_images = []
         self.load_faces()
 
     def load_faces(self):
@@ -58,13 +60,16 @@ class FaceClassification(robokudo.annotators.core.BaseAnnotator):
 
         print(f' Set descriptor to: {filenames} and {classes}')
 
+        self.known_person_image = []
+        self.known_face_encodings = []
+
         for file_name in self.descriptor.parameters.file_names:
             file_path: Path = data_folder_path.joinpath(f"{file_name}")
             if not file_path.exists():
                 self.rk_logger.error(f"No face image file found at '{file_path}'")
 
-            known_person_image = face_recognition.load_image_file(str(file_path))
-            known_person_encoding = face_recognition.face_encodings(known_person_image)[0]
+            self.known_person_image = face_recognition.load_image_file(str(file_path))
+            known_person_encoding = face_recognition.face_encodings(self.known_person_image)[0]
             self.known_face_encodings.append(known_person_encoding)
 
     @robokudo.utils.error_handling.catch_and_raise_to_blackboard
@@ -90,13 +95,16 @@ class FaceClassification(robokudo.annotators.core.BaseAnnotator):
                     continue
 
                 # Classify the given face by comparing against the loaded face encodings
-                results = face_recognition.compare_faces(self.known_face_encodings,
-                                                         encoding_annotation.encoding[0])
-                detected_classes = [name for (match, name) in zip(results, self.descriptor.parameters.labels) if match]
+                #results = face_recognition.compare_faces(self.known_face_encodings,
+                #                                         encoding_annotation.encoding[0])
+                distance = face_recognition.face_distance(self.known_face_encodings, encoding_annotation.encoding[0])
+
+                detected_classes = [(match, name) for (match, name) in zip(distance, self.descriptor.parameters.labels)
+                                    if match < self.descriptor.parameters.distance]
 
                 # TODO: Make majority voting scheme or switch to kNN
                 if len(detected_classes) > 0:
-                    detected_class = detected_classes[0]
+                    detected_class = min(detected_classes, key=lambda x: x[0])[1]
                     classification = robokudo.types.annotation.Classification()
                     classification.source = self.name
                     classification.classification_type = 'face'

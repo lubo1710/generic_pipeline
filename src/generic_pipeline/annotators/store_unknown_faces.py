@@ -68,7 +68,7 @@ class StoreFaces(robokudo.annotators.core.ThreadedAnnotator):
                     file_path = full_path
 
                     # Store unknown image under a unique id
-                    file_name = f'human_{self._get_id(full_path)}.png'
+                    file_name = f'{self._get_id(full_path)}.png'
                     file = os.path.join(file_path, file_name)
                     cropped_image = color_image[y_min:y_max,x_min:x_max]
                     image = Image.fromarray(cropped_image)
@@ -108,9 +108,10 @@ class StoreFaces(robokudo.annotators.core.ThreadedAnnotator):
         names = []
         for filename in os.listdir(path):
             names.append(filename.split(".")[0])
-        print(len(names))
+
         for i in range(1000):
-            if not str(i) in names:
-                return str(i)
+            name = f'human_{i}'
+            if not (name in names):
+                return str(f'human_{i}')
         raise "Coudn't find Id to store faces"
 
