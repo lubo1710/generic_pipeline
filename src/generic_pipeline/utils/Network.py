@@ -273,7 +273,7 @@ class RobokudoGraph(DiGraph):
     'Metalbowl',
     'Sugarbox',
     'Coffeecan',
-    'Milkpackja',
+    'Milk',
     'Apple',
     'Tomatosoupcan',
     'Tunafishcan',
@@ -281,7 +281,7 @@ class RobokudoGraph(DiGraph):
     'Pear',
     'Lemon',
     'Banana',
-    'Pottedmeatcan',
+    'Meatcan',
     'Peach',
     'Plum',
     'Rubikscube',
@@ -293,25 +293,37 @@ class RobokudoGraph(DiGraph):
     'Scissors',
     'Scrubcleaner',
     'Grapes',
-    'Cup_small',
-    'screwdriver',
-    'clamp',
-    'hammer',
-    'wooden_block',
+    'Cupsmall',
+    'Screwdriver',
+    'Clamp',
+    'Hammer',
+    'Woodenblock',
     'Cornybox',
-    'object']
+    'object',
+    'cup',
+    'muesli',
+    'fruit',
+    'dish',
+    'cutlery',
+    'tool',
+    'toy',
+    'ball',
+    'food',
+    'drink',
+    'coffee',
+    'cleaning_tool']
 
         #Pose & ObjectHypothese
         queried_attributes = [robokudo.types.annotation.PoseAnnotation]
         if query.obj.type == 'person':
             self.specification[robokudo.types.scene.ObjectHypothesis] = 'person'
-            self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
+            self.specification[robokudo.types.annotation.PoseAnnotation] = 'person'
 
         if query.obj.type == '':
             self.specification[robokudo.types.scene.ObjectHypothesis] = 'object'
             self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
 
-        if query.obj.type != 'person' and query.obj.type != '':
+        if query.obj.type != 'person':
             if query.obj.type in list_of_objects:
                 self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
                 self.specification[robokudo.types.scene.ObjectHypothesis] = query.obj.type

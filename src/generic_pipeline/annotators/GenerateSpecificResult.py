@@ -74,7 +74,8 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                         continue
 
                     # YoloAnnotator
-                    if oh_annotation.classname != query_obj.type and query_obj.type != '':
+                    print('Yolo beim auswerten')
+                    if not self.is_required(oh_annotation):
                         print('Not the right object due classification')
                         queried = False
                         break
@@ -140,7 +141,7 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
                     # We assume that the pose annotation is in CAMERA coordinates
                     ps.header = copy.deepcopy(self.get_cas().get(CASViews.CAM_INFO).header)
-                    ps.header.frame_id = '/map'
+                    ps.header.frame_id = 'map'
                     object_designator.pose.append(ps)
 
                     object_designator.pose_source.append(oh_annotation.source)
@@ -165,3 +166,40 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
         self.feedback_message = f"Send result for {object_hypotheses_count} object hypotheses"
         return py_trees.Status.SUCCESS
+
+    def is_required(self, annotation_type):
+        print(annotation_type)
+
+        tree_of_objects = {
+                'cup' : ['Cupblue','Cupgreen','Cupsmall','Metalmug'],
+                'muesli' : ['Crackerbox','Cerealbox','Mueslibox'],
+                'fruit' : ['Strawberry','Apple','Orange','Pear','Lemon','Banana','Peach','Plum','Grapes',],
+                'dish' : ['Metalplate', 'Metalbowl','Wineglass'],
+                'cutlery' : ['Fork','Spoon','Knife'],
+                'tool' : ['Scissors','Screwdriver','Clamp','Hammer','Woodenblock','Largemarker','Abrasivesponge'],
+                'toy' : ['Rubikscube'],
+                'ball' : ['Minisoccerball','Baseball','Softball','Tennisball'],
+                'food' : ['Mustardbottle','Jellochocolatepuddingbox','Pringleschipscan','Jellobox','Sugarbox',
+                          'Tomatosoupcan', 'Tunafishcan','Gelatinebox','Meatcan'],
+                'drink' : ['Milk','Pitcher'],
+                'coffee' : ['Coffeepack','Coffeecan','Masterchefcan'],
+                'cleaning_tool' : ['Bleachcleanserbottle', 'Glasscleanerspraybottle','Dishwashertab','Scrubcleaner']
+        }
+
+        # Input from High level
+        query_type = self.get_cas().get(CASViews.QUERY).obj.type
+
+        # Annotation type
+        annotation_type = annotation_type.classname
+
+        # If empty or direct match object is required
+        if query_type == '' or query_type == annotation_type:
+            return True
+
+        # Class instead of direct type
+        if query_type in tree_of_objects.keys():
+            if annotation_type in tree_of_objects[query_type]:
+                return True
+
+        # Not required because
+        return False
