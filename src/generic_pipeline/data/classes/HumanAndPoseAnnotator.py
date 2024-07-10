@@ -20,5 +20,5 @@ class Annotator:
         'depth_truncate' : 3.5
         }
     inputs = []
-    outputs = [robokudo.types.scene.ObjectHypothesis]
-    capabilities = {robokudo.types.scene.ObjectHypothesis : ['person']}
+    outputs = [robokudo.types.scene.HumanHypothesis]
+    capabilities = {robokudo.types.scene.HumanHypothesis : ['person']}

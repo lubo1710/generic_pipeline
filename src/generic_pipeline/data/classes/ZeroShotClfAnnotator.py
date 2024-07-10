@@ -15,6 +15,6 @@ class Annotator:
         'analysis_scope' : robokudo.types.scene.ObjectHypothesis,
         'gpsr' : True
     }
-    inputs = [robokudo.types.scene.ObjectHypothesis]
+    inputs = [robokudo.types.scene.HumanHypothesis]
     outputs = [robokudo.types.core.Annotation]
     capabilities = {}

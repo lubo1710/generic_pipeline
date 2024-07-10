@@ -3,7 +3,7 @@ import py_trees
 import importlib.util
 from itertools import chain, combinations
 from networkx.classes import DiGraph
-from networkx.classes import MultiDiGraph
+from generic_pipeline.annotators.Dummy import Dummy
 from networkx.algorithms.traversal import bfs_tree
 import os
 import robokudo
@@ -59,7 +59,7 @@ class RobokudoGraph(DiGraph):
         except FileNotFoundError:
             raise 'File not Found'
 
-        print(attributes)
+
         failure = False
         while attributes and not failure: # Solange Attribute nicht leer
             failure = True
@@ -213,7 +213,6 @@ class RobokudoGraph(DiGraph):
 
         print( f'Network compute this pipeline: {annotator_names}')
         self.timeend = time.time()
-        print(self.timeend - self.timebegin)
         print(f'Process took {self.timeend-self.timebegin} seconds')
         seq = py_trees.composites.Sequence()
         seq.add_children(annotator_list)
@@ -246,91 +245,99 @@ class RobokudoGraph(DiGraph):
         self.query = query
 
         list_of_objects = [
-    'Fork',
-    'Pitcher',
-    'Bleachcleanserbottle',
-    'Crackerbox',
-    'Minisoccerball',
-    'Baseball',
-    'Mustardbottle',
-    'Jellochocolatepuddingbox',
-    'Wineglass',
-    'Orange',
-    'Coffeepack',
-    'Softball',
-    'Metalplate',
-    'Pringleschipscan',
-    'Strawberry',
-    'Glasscleanerspraybottle',
-    'Tennisball',
-    'Spoon',
-    'Metalmug',
-    'Abrasivesponge',
-    'Jellobox',
-    'Dishwashertab',
-    'Knife',
-    'Cerealbox',
-    'Metalbowl',
-    'Sugarbox',
-    'Coffeecan',
-    'Milk',
-    'Apple',
-    'Tomatosoupcan',
-    'Tunafishcan',
-    'Gelatinebox',
-    'Pear',
-    'Lemon',
-    'Banana',
-    'Meatcan',
-    'Peach',
-    'Plum',
-    'Rubikscube',
-    'Mueslibox',
-    'Cupblue',
-    'Cupgreen',
-    'Largemarker',
-    'Masterchefcan',
-    'Scissors',
-    'Scrubcleaner',
-    'Grapes',
-    'Cupsmall',
-    'Screwdriver',
-    'Clamp',
-    'Hammer',
-    'Woodenblock',
-    'Cornybox',
-    'object',
-    'cup',
-    'muesli',
-    'fruit',
-    'dish',
-    'cutlery',
-    'tool',
-    'toy',
-    'ball',
-    'food',
-    'drink',
-    'coffee',
-    'cleaning_tool']
+            'Fork',
+            'Pitcher',
+            'Bleachcleanserbottle',
+            'Crackerbox',
+            'Minisoccerball',
+            'Baseball',
+            'Mustardbottle',
+            'Jellochocolatepuddingbox',
+            'Wineglass',
+            'Orange',
+            'Coffeepack',
+            'Softball',
+            'Metalplate',
+            'Pringleschipscan',
+            'Strawberry',
+            'Glasscleanerspraybottle',
+            'Tennisball',
+            'Spoon',
+            'Metalmug',
+            'Abrasivesponge',
+            'Jellobox',
+            'Dishwashertab',
+            'Knife',
+            'Cerealbox',
+            'Metalbowl',
+            'Sugarbox',
+            'Coffeecan',
+            'Milk',
+            'Apple',
+            'Tomatosoupcan',
+            'Tunafishcan',
+            'Gelatinebox',
+            'Pear',
+            'Lemon',
+            'Banana',
+            'Meatcan',
+            'Peach',
+            'Plum',
+            'Rubikscube',
+            'Mueslibox',
+            'Cupblue',
+            'Cupgreen',
+            'Largemarker',
+            'Masterchefcan',
+            'Scissors',
+            'Scrubcleaner',
+            'Grapes',
+            'Cupsmall',
+            'Screwdriver',
+            'Clamp',
+            'Hammer',
+            'Woodenblock',
+            'Cornybox',
+            'object',
+            'cup',
+            'muesli',
+            'fruit',
+            'dish',
+            'cutlery',
+            'tool',
+            'toy',
+            'ball',
+            'food',
+            'drink',
+            'coffee',
+            'cleaning_tool']
 
         #Pose & ObjectHypothese
         queried_attributes = [robokudo.types.annotation.PoseAnnotation]
+        self.specification = {}
+        self.clear()
+
         if query.obj.type == 'person':
-            self.specification[robokudo.types.scene.ObjectHypothesis] = 'person'
+            self.specification[robokudo.types.scene.HumanHypothesis] = 'person'
             self.specification[robokudo.types.annotation.PoseAnnotation] = 'person'
 
         if query.obj.type == '':
-            self.specification[robokudo.types.scene.ObjectHypothesis] = 'object'
             self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
+            self.specification[robokudo.types.scene.ObjectHypothesis] = 'object'
+            self.specification[robokudo.types.annotation.Classification] = 'object'
+            queried_attributes.append(robokudo.types.annotation.Classification)
 
-        if query.obj.type != 'person':
+        if query.obj.type != 'person' and query.obj.type != '':
             if query.obj.type in list_of_objects:
                 self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
                 self.specification[robokudo.types.scene.ObjectHypothesis] = query.obj.type
-            else:
+                self.specification[robokudo.types.annotation.Classification] = query.obj.type
+            if query.obj.type == 'faces':
+                self.specification[robokudo.types.annotation.PoseAnnotation] = 'faces'
+                self.specification[robokudo.types.annotation.Classification] = 'faces'
+            if not (query.obj.type in list_of_objects or query.obj.type == 'faces'):
                 self.specification[robokudo.types.annotation.PoseAnnotation] = 'person'
-            self.specification[robokudo.types.annotation.Classification] = query.obj.type
-            print('insert classification')
+                self.specification[robokudo.types.annotation.Classification] = query.obj.type
             queried_attributes.append(robokudo.types.annotation.Classification)
 
         # Color

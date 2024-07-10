@@ -9,4 +9,4 @@ class Annotator:
     parameters = {}
     inputs = []
     outputs = [robokudo.types.human.FaceAnnotation, robokudo.types.scene.HumanHypothesis]
-    capabilities = {}
+    capabilities = {robokudo.types.scene.HumanHypothesis : 'faces'}
