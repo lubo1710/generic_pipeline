@@ -15,6 +15,8 @@ from robokudo.types.annotation import PoseAnnotation, PositionAnnotation
 from robokudo.utils.annotator_helper import transform_pose_from_cam_to_world
 from robokudo_msgs.msg import ShapeSize
 from geometry_msgs.msg import Vector3
+import cv2
+
 
 class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
     """
@@ -28,6 +30,7 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
         blackboard = py_trees.Blackboard()
         annotations = self.get_cas().annotations
         object_hypotheses_count = 0
+        oh_for_visualization = []
         query_result = []
 
         query_obj = self.get_cas().get(CASViews.QUERY).obj
@@ -44,8 +47,6 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                 # Color
                 if isinstance(oh_annotation, robokudo.types.annotation.SemanticColor):
                     if query_obj.color and not oh_annotation.color in query_obj.color and not right_color:
-                        print(oh_annotation.color)
-                        print(query_obj.color)
                         print('Not the right object due color')
                         queried = False
                         break
@@ -74,9 +75,7 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                         continue
 
                     # YoloAnnotator
-                    print('Yolo beim auswerten')
                     if not self.is_required(oh_annotation):
-                        print('Not the right object due classification')
                         queried = False
                         break
                     object_designator.type = oh_annotation.classname
@@ -159,8 +158,10 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
 
             if queried:
+                oh_for_visualization.append(annotation)
                 query_result.append(object_designator)
 
+        self.vis_base_mode(oh_for_visualization)
         result.res = query_result
         blackboard.set(BBIdentifier.QUERY_ANSWER, result)
 
@@ -168,22 +169,20 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
         return py_trees.Status.SUCCESS
 
     def is_required(self, annotation_type):
-        print(annotation_type)
-
         tree_of_objects = {
-                'cup' : ['Cupblue','Cupgreen','Cupsmall','Metalmug'],
-                'muesli' : ['Crackerbox','Cerealbox','Mueslibox'],
-                'fruit' : ['Strawberry','Apple','Orange','Pear','Lemon','Banana','Peach','Plum','Grapes',],
-                'dish' : ['Metalplate', 'Metalbowl','Wineglass'],
-                'cutlery' : ['Fork','Spoon','Knife'],
-                'tool' : ['Scissors','Screwdriver','Clamp','Hammer','Woodenblock','Largemarker','Abrasivesponge'],
-                'toy' : ['Rubikscube'],
-                'ball' : ['Minisoccerball','Baseball','Softball','Tennisball'],
-                'food' : ['Mustardbottle','Jellochocolatepuddingbox','Pringleschipscan','Jellobox','Sugarbox',
-                          'Tomatosoupcan', 'Tunafishcan','Gelatinebox','Meatcan'],
-                'drink' : ['Milk','Pitcher'],
-                'coffee' : ['Coffeepack','Coffeecan','Masterchefcan'],
-                'cleaning_tool' : ['Bleachcleanserbottle', 'Glasscleanerspraybottle','Dishwashertab','Scrubcleaner']
+                'cup' : ['cup_blue','cup_green','cup_small','metal_mug'],
+                'muesli' : ['cracker_box','cereal_box','muesli_box'],
+                'fruit' : ['strawberry','apple','orange','pear','lemon','banana','peach','plum','grapes',],
+                'dish' : ['metal_plate', 'metal_bowl','wineglass'],
+                'cutlery' : ['fork','spoon','knife'],
+                'tool' : ['scissors','screwdriver','clamp','hammer','wooden_block','large_marker','abrasive_sponge'],
+                'toy' : ['rubikscube'],
+                'ball' : ['mini_soccer_ball','baseball','softball','tennisball'],
+                'food' : ['mustard_bottle','jello_chocolate_pudding_box','pringles_chips_can','jello_box','sugar_box',
+                          'tomato_soupcan', 'tuna_fish_can','gelatine_box','meat_can'],
+                'drink' : ['milk','Pitcher'],
+                'coffee' : ['coffee_pack','coffee_can','master_chef_can'],
+                'cleaning_tool' : ['bleach_cleanser_bottle', 'glass_cleaner_spray_bottle','dishwasher_tab','scrub_cleaner']
         }
 
         # Input from High level
@@ -201,5 +200,30 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
             if annotation_type in tree_of_objects[query_type]:
                 return True
 
-        # Not required because
+        # Not required
         return False
+
+    def vis_base_mode(self, object_hypotheses):
+        """Visualizes ObjectHypothesis. Function is from Lennart Heinbokel in the YOLOAnnotator"""
+        visualization_img = self.get_cas().get_copy(CASViews.COLOR_IMAGE)
+        vis_geometries = []
+
+        for oh in object_hypotheses:  # pylint: disable=invalid-name
+            assert isinstance(oh, robokudo.types.scene.ObjectHypothesis)
+            # pylint: disable=invalid-name
+            x1, y1, x2, y2 = (oh.roi.roi.pos.x,
+                              oh.roi.roi.pos.y,
+                              oh.roi.roi.pos.x + oh.roi.roi.width,
+                              oh.roi.roi.pos.y + oh.roi.roi.height)
+
+            text = f"{oh.annotations[0].classname}, {oh.annotations[0].confidence:.2f}"
+            font = cv2.FONT_HERSHEY_COMPLEX
+            visualization_img = cv2.putText(visualization_img, text, (x1, y1 - 5), font, 0.5,
+                                            (0, 0, 255), 1, 2)
+            visualization_img = cv2.rectangle(visualization_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            vis_geometries.append(oh.points)
+
+        self.get_annotator_output_struct().set_image(visualization_img)
+        if self.descriptor.parameters.global_with_depth:
+            self.get_annotator_output_struct().set_geometries(vis_geometries)
+
