@@ -334,9 +334,11 @@ class RobokudoGraph(DiGraph):
             if query.obj.type == 'faces':
                 self.specification[robokudo.types.annotation.PoseAnnotation] = 'faces'
                 self.specification[robokudo.types.annotation.Classification] = 'faces'
+            # Case with unknown object type
             if not (query.obj.type in list_of_objects or query.obj.type == 'faces'):
-                self.specification[robokudo.types.annotation.PoseAnnotation] = 'person'
-                self.specification[robokudo.types.annotation.Classification] = query.obj.type
+                self.specification[robokudo.types.annotation.PoseAnnotation] = 'object'
+                self.specification[robokudo.types.scene.ObjectHypothesis] = 'object'
+                self.specification[robokudo.types.annotation.Classification] = 'object'
             queried_attributes.append(robokudo.types.annotation.Classification)
 
         # Color

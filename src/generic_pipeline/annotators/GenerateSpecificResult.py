@@ -75,10 +75,15 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
                         continue
 
                     # YoloAnnotator
-                    if not self.is_required(oh_annotation):
-                        queried = False
-                        break
-                    object_designator.type = oh_annotation.classname
+                    try:
+                        if not self.is_required(oh_annotation):
+                            queried = False
+                            break
+                        object_designator.type = oh_annotation.classname
+                    except :
+                        object_designator.type = oh_annotation.classname
+                        object_designator.description.append('Submitted type is unknown, return everything!')
+
 
                 # Size
                 if isinstance(oh_annotation, robokudo.types.cv.BoundingBox3D):
@@ -200,8 +205,12 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
             if annotation_type in tree_of_objects[query_type]:
                 return True
 
-        # Not required
-        return False
+        for klasse in tree_of_objects.keys():
+            for item in tree_of_objects[klasse]:
+                if item == query_type:
+                    return False
+        print('Submitted type is unknown')
+        raise 'Submitted type is unknown!'
 
     def vis_base_mode(self, object_hypotheses):
         """Visualizes ObjectHypothesis. Function is from Lennart Heinbokel in the YOLOAnnotator"""

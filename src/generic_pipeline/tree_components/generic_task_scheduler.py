@@ -59,7 +59,6 @@ class GenericTaskScheduler(robokudo.tree_components.task_scheduler.TaskScheduler
         pos = nx.circular_layout(self.graph)  # Position nodes using Fruchterman-Reingold force-directed algorithm
 
         # Actual drawing of the graph
-        print(self.graph.edges)
         nx.draw(self.graph, pos, with_labels=True, node_color='lightblue', arrows=True)
         nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_names)
 
@@ -79,5 +78,4 @@ class GenericTaskScheduler(robokudo.tree_components.task_scheduler.TaskScheduler
         complete_as_string = str(name)
         last_component = complete_as_string.split('.')[-1]
         cleaned_string = ''.join(char for char in last_component if char.isalpha())
-        print(cleaned_string)
         return cleaned_string
