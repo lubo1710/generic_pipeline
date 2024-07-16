@@ -175,21 +175,15 @@ class GenerateSpecificResult(robokudo.annotators.core.BaseAnnotator):
 
     def is_required(self, annotation_type):
         tree_of_objects = {
-                'cup' : ['cup_blue','cup_green','cup_small','metal_mug'],
-                'muesli' : ['cracker_box','cereal_box','muesli_box'],
-                'fruit' : ['strawberry','apple','orange','pear','lemon','banana','peach','plum','grapes',],
-                'dish' : ['metal_plate', 'metal_bowl','wineglass'],
-                'cutlery' : ['fork','spoon','knife'],
-                'tool' : ['scissors','screwdriver','clamp','hammer','wooden_block','large_marker','abrasive_sponge'],
-                'toy' : ['rubikscube'],
-                'ball' : ['mini_soccer_ball','baseball','softball','tennisball'],
-                'food' : ['mustard_bottle','jello_chocolate_pudding_box','pringles_chips_can','jello_box','sugar_box',
-                          'tomato_soupcan', 'tuna_fish_can','gelatine_box','meat_can'],
-                'drink' : ['milk','Pitcher'],
-                'coffee' : ['coffee_pack','coffee_can','master_chef_can'],
-                'cleaning_tool' : ['bleach_cleanser_bottle', 'glass_cleaner_spray_bottle','dishwasher_tab','scrub_cleaner']
-        }
+                'cleaning_supplies' : ['soap', 'dishwasher_tab', 'washcloth' , 'sponge'],
+                'drinks' : ['cola', 'ice_tea', 'water', 'milk', 'big_coke', 'fanta', 'dubbelfris'],
+                'food' : ['cornflakes', 'pea_soup', 'curry', 'pancake_mix', 'hagelslag', 'sausages', 'mayonaise'],
+                'decorations' : ['candle'],
+                'fruits' : ['pear', 'plum', 'peach', 'lemon', 'orange', 'strawberry', 'banana', 'apple'],
+                'snacks' : ['stroopwafel', 'candy', 'liqourice', 'crisps', 'pringles', 'tictac'],
+                'dishes' : ['spoon', 'plate', 'cup', 'fork', 'bowl', 'knife']
 
+        }
         # Input from High level
         query_type = self.get_cas().get(CASViews.QUERY).obj.type
 

@@ -66,7 +66,7 @@ class Annotator:
     parameters = {
     'precision_mode' : True,
     'ros_pkg_path' : 'generic_pipeline',
-    'weights_path' : 'src/generic_pipeline/Weights-SUTURO23/data_03_24.pt',
+    'weights_path' : 'src/generic_pipeline/Weights-SUTURO23/robocup_first_day.pt',
     'id2name_json_path' : 'src/generic_pipeline/data/json/id2name_robocup.json',
     'threshold' : 0.6
     }
