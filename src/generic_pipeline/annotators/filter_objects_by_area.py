@@ -16,11 +16,11 @@ class FilterObjectsByArea(robokudo.annotators.core.BaseAnnotator):
             """Parameters for the Descriptor."""
             def __init__(self):
                 # Submitted area coordinates
-                self.min_x = 0  # -float('inf')
+                self.min_x = -1  # -float('inf')
                 self.min_y = -3
                 self.min_z = -float('inf')
-                self.max_x = 9.5
-                self.max_y = 6.74
+                self.max_x = 11
+                self.max_y = 10
                 self.max_z = float('inf')
 
                 # In which frame are the coordinates?
